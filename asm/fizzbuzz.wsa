@@ -1,0 +1,67 @@
+; fizzbuzz.wsa
+; Plays Fizz Buzz (https://en.wikipedia.org/wiki/Fizz_buzz) up to 100
+
+push 1
+.loop:
+  push 100
+  copy 1
+  sub
+  jn .done
+
+  dup
+  push 15
+  mod
+  jz .fizzbuzz
+
+  dup
+  push 3
+  mod
+  jz .fizz
+
+  dup
+  push 5
+  mod
+  jz .buzz
+
+  dup
+  wnum
+.loop-incr:
+  push '\n'
+  wchar
+  push 1
+  add
+  jump .loop
+
+.fizzbuzz:
+  push 'f'
+  wchar
+  push 'i'
+  wchar
+  push 'z'
+  wchar
+  push 'z'
+  wchar
+.buzz:
+  push 'b'
+  wchar
+  push 'u'
+  wchar
+  push 'z'
+  wchar
+  push 'z'
+  wchar
+  jump .loop-incr
+
+.fizz:
+  push 'f'
+  wchar
+  push 'i'
+  wchar
+  push 'z'
+  wchar
+  push 'z'
+  wchar
+  jump .loop-incr
+
+.done:
+  end
