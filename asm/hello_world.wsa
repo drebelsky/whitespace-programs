@@ -1,0 +1,28 @@
+; hello_world.ws
+; A simple program that prints "Hello world!" to the screen
+push 'H'
+wchar
+push 'e'
+wchar
+push 'l'
+wchar
+push 'l'
+wchar
+push 'o'
+wchar
+push ' '
+wchar
+push 'w'
+wchar
+push 'o'
+wchar
+push 'r'
+wchar
+push 'l'
+wchar
+push 'd'
+wchar
+push '!'
+wchar
+push '\n'
+wchar
