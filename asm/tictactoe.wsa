@@ -1,0 +1,725 @@
+; An interactive tic-tac-toe game written in whitespace
+
+; +---------------+
+; | Memory layout |
+; +---------------+
+; 0-499     : scratch space
+; 500       : player (char : "X" or "O")
+; 1000-1008 : board  (chars from "XO ")
+;             1000|1001|1002
+;             ----+----+----
+;             1003|1004|1005
+;             ----+----+----
+;             1006|1007|1008
+
+; +--------------------+
+; | Calling convention |
+; +--------------------+
+; The arguments for a function should be pushed in order
+; That is, fun(a, b, c) would be invoked by
+;   push a
+;   push b
+;   push c
+;   call fun
+
+; +------------+
+; | Procedures |
+; +------------+
+; void print_board(): prints the board
+; void print_state(): prints the board, and player message
+; void get_move(): gets the user to make a move—does error handling and such, updates BOARD memory as appropriate
+; char get_winner(int pos1, int pos2, int pos3):
+;     pos1, pos2, and pos3 are indices into board
+;     returns board[pos1] if board[pos1] == board[pos2] == board[pos3] != " ", else 0
+; bool is_open_space(): returns if there's an open space (1 = true, 0 = false)
+
+; Constants
+; BOARD = 1000
+; PLAYER = 500
+
+
+; +----------------+
+; | Initialization |
+; +----------------+
+
+; Set board to be initially spaces
+push 1000 ; BOARD
+push ' '
+store
+push 1001 ; BOARD + 1
+push ' '
+store
+push 1002 ; BOARD + 2
+push ' '
+store
+push 1003 ; BOARD + 3
+push ' '
+store
+push 1004 ; BOARD + 4
+push ' '
+store
+push 1005 ; BOARD + 5
+push ' '
+store
+push 1006 ; BOARD + 6
+push ' '
+store
+push 1007 ; BOARD + 7
+push ' '
+store
+push 1008 ; BOARD + 8
+push ' '
+store
+
+; Set player to be X
+loop_set_X:
+  push 500 ; PLAYER
+  push 'X'
+  store
+
+game_loop:
+  call print_state
+  call get_move
+
+  ; Check for winners
+  .row_1:
+    push 0
+    push 1
+    push 2
+    call get_winner
+    dup
+    jz .row_2
+    jump .has_won
+
+  .row_2:
+    pop
+    push 3
+    push 4
+    push 5
+    call get_winner
+    dup
+    jz .row_3
+    jump .has_won
+
+  .row_3:
+    pop
+    push 6
+    push 7
+    push 8
+    call get_winner
+    dup
+    jz .col_1
+    jump .has_won
+
+  .col_1:
+    pop
+    push 0
+    push 3
+    push 6
+    call get_winner
+    dup
+    jz .col_2
+    jump .has_won
+
+  .col_2:
+    pop
+    push 1
+    push 4
+    push 7
+    call get_winner
+    dup
+    jz .col_3
+    jump .has_won
+
+  .col_3:
+    pop
+    push 2
+    push 5
+    push 8
+    call get_winner
+    dup
+    jz .diag_1
+    jump .has_won
+
+  .diag_1:
+    pop
+    push 0
+    push 4
+    push 8
+    call get_winner
+    dup
+    jz .diag_2
+    jump .has_won
+
+  .diag_2:
+    pop
+    push 2
+    push 4
+    push 6
+    call get_winner
+    dup
+    jz .no_winner
+    jump .has_won
+
+  .no_winner:
+    pop
+
+  call is_open_space
+  jz .tie_game
+
+  push 500 ; PLAYER
+  load
+  push "O"
+  sub
+  jz loop_set_X
+
+  ; Otherwise, we need to set O
+  push 500 ; PLAYER
+  push 'O'
+  store
+
+  jump game_loop
+
+  .has_won:
+    call print_board
+    wchar
+    ; print " won!"
+    push ' '
+    wchar
+    push 'w'
+    wchar
+    push 'o'
+    wchar
+    push 'n'
+    wchar
+    push '!'
+    wchar
+    push '\n'
+    wchar
+    end
+
+  .tie_game:
+    call print_board
+    ; print "It's a draw"
+    push 'I'
+    wchar
+    push 't'
+    wchar
+    push '''
+    wchar
+    push 's'
+    wchar
+    push ' '
+    wchar
+    push 'a'
+    wchar
+    push ' '
+    wchar
+    push 'd'
+    wchar
+    push 'r'
+    wchar
+    push 'a'
+    wchar
+    push 'w'
+    wchar
+    push '\n'
+    wchar
+    end
+
+; +----------------------------+
+; | Proc: bool is_open_space() |
+; +----------------------------+
+
+is_open_space:
+  push 1000 ; BOARD + 0
+  load
+  push ' '
+  sub
+  jz is_open_space.true
+  push 1001 ; BOARD + 1
+  load
+  push ' '
+  sub
+  jz is_open_space.true
+  push 1002 ; BOARD + 2
+  load
+  push ' '
+  sub
+  jz is_open_space.true
+  push 1003 ; BOARD + 3
+  load
+  push ' '
+  sub
+  jz is_open_space.true
+  push 1004 ; BOARD + 4
+  load
+  push ' '
+  sub
+  jz is_open_space.true
+  push 1005 ; BOARD + 5
+  load
+  push ' '
+  sub
+  jz is_open_space.true
+  push 1006 ; BOARD + 6
+  load
+  push ' '
+  sub
+  jz is_open_space.true
+  push 1007 ; BOARD + 7
+  load
+  push ' '
+  sub
+  jz is_open_space.true
+  push 1008 ; BOARD + 8
+  load
+  push ' '
+  sub
+  jz is_open_space.true
+
+  push 0
+  ret
+
+  is_open_space.true:
+    push 1
+    ret
+
+; +------------------------------------------------------+
+; | Proc: char get_winner(int pos1, int pos2, int pos3): |
+; +------------------------------------------------------+
+; Notes:
+;   pos1, pos2, and pos3 are indices into board
+;   returns board[pos1] if board[pos1] == board[pos2] == board[pos3] != " ", else 0
+
+get_winner:
+  ; stack is b[p3]
+  ; Check that p3 != " "
+  dup
+  push 1000 ; BOARD
+  add
+  load
+  dup
+  push ' '
+  sub
+  jz get_winner.none
+
+  ; stack is now <p1, p2, p3, b[p3]>
+  copy 2    ; <p1, p2, p3, b[p3], p2>
+  push 1000 ; BOARD
+  add
+  load
+  copy 1
+  sub
+  jz get_winner.2-3_equal
+  jump get_winner.none
+
+  get_winner.2-3_equal:
+    copy 3
+    push 1000 ; BOARD
+    add
+    load   ; <p1, p2, p3, b[p3], b[p1]>
+    copy 1 ; <p1, p2, p3, b[p3], b[p1], b[p3]>
+    sub
+    jz get_winner.all_equal
+    jump get_winner.none
+
+  get_winner.all_equal:
+    ; <p1, p2, p3, b[p3]>
+    slide 3
+    ret
+
+  get_winner.none:
+    pop
+    push 0
+    slide 3
+    ret
+
+; +----------------+
+; | Proc: get_move |
+; +----------------+
+; Notes:
+;   Uses 0 as scratch space to get character input
+get_move:
+get_move.message:
+  ; print "Enter move (between 1 and 9): "
+  push 'E'
+  wchar
+  push 'n'
+  wchar
+  push 't'
+  wchar
+  push 'e'
+  wchar
+  push 'r'
+  wchar
+  push ' '
+  wchar
+  push 'm'
+  wchar
+  push 'o'
+  wchar
+  push 'v'
+  wchar
+  push 'e'
+  wchar
+  push ' '
+  wchar
+  push '('
+  wchar
+  push 'b'
+  wchar
+  push 'e'
+  wchar
+  push 't'
+  wchar
+  push 'w'
+  wchar
+  push 'e'
+  wchar
+  push 'e'
+  wchar
+  push 'n'
+  wchar
+  push ' '
+  wchar
+  push '1'
+  wchar
+  push ' '
+  wchar
+  push 'a'
+  wchar
+  push 'n'
+  wchar
+  push 'd'
+  wchar
+  push ' '
+  wchar
+  push '9'
+  wchar
+  push ')'
+  wchar
+  push ':'
+  wchar
+  push ' '
+  wchar
+
+  push 0
+  rnum
+
+  ; Verify that 1–9 was entered
+  ; <= 9
+  push 9
+  push 0
+  load
+  sub
+  jn get_move.badnum
+
+  ; >= 1
+  push 0
+  load
+  push 1
+  sub
+  jn get_move.badnum
+
+  ; Verify that the space is not occupied
+  push 0
+  load
+  push 999 ; BOARD - 1, -1 since we take an ordinal, not an index
+  add
+  load
+  push ' '
+  sub
+  jz get_move.goodmove
+
+  ; print "That space is occupied!\n"
+  push 'T'
+  wchar
+  push 'h'
+  wchar
+  push 'a'
+  wchar
+  push 't'
+  wchar
+  push ' '
+  wchar
+  push 's'
+  wchar
+  push 'p'
+  wchar
+  push 'a'
+  wchar
+  push 'c'
+  wchar
+  push 'e'
+  wchar
+  push ' '
+  wchar
+  push 'i'
+  wchar
+  push 's'
+  wchar
+  push ' '
+  wchar
+  push 'o'
+  wchar
+  push 'c'
+  wchar
+  push 'c'
+  wchar
+  push 'u'
+  wchar
+  push 'p'
+  wchar
+  push 'i'
+  wchar
+  push 'e'
+  wchar
+  push 'd'
+  wchar
+  push '!'
+  wchar
+  push '\n'
+  wchar
+
+  jump get_move.message
+
+  get_move.goodmove:
+    ; Store value on board
+    push 0
+    load
+    push 999 ; BOARD - 1 since we take an ordinal, not an index
+    add
+    push 500 ; PLAYER
+    load
+    store
+    ret
+
+  get_move.badnum:
+    ; print "The number must be between 1 and 9!\n"
+    push 'T'
+    wchar
+    push 'h'
+    wchar
+    push 'e'
+    wchar
+    push ' '
+    wchar
+    push 'n'
+    wchar
+    push 'u'
+    wchar
+    push 'm'
+    wchar
+    push 'b'
+    wchar
+    push 'e'
+    wchar
+    push 'r'
+    wchar
+    push ' '
+    wchar
+    push 'm'
+    wchar
+    push 'u'
+    wchar
+    push 's'
+    wchar
+    push 't'
+    wchar
+    push ' '
+    wchar
+    push 'b'
+    wchar
+    push 'e'
+    wchar
+    push ' '
+    wchar
+    push 'b'
+    wchar
+    push 'e'
+    wchar
+    push 't'
+    wchar
+    push 'w'
+    wchar
+    push 'e'
+    wchar
+    push 'e'
+    wchar
+    push 'n'
+    wchar
+    push ' '
+    wchar
+    push '1'
+    wchar
+    push ' '
+    wchar
+    push 'a'
+    wchar
+    push 'n'
+    wchar
+    push 'd'
+    wchar
+    push ' '
+    wchar
+    push '9'
+    wchar
+    push '!'
+    wchar
+    push '\n'
+    wchar
+
+    jump get_move.message
+
+; +-------------------+
+; | Proc: print_state |
+; +-------------------+
+print_state:
+  call print_board
+  ; print "It is currently player "
+  push 'I'
+  wchar
+  push 't'
+  wchar
+  push ' '
+  wchar
+  push 'i'
+  wchar
+  push 's'
+  wchar
+  push ' '
+  wchar
+  push 'c'
+  wchar
+  push 'u'
+  wchar
+  push 'r'
+  wchar
+  push 'r'
+  wchar
+  push 'e'
+  wchar
+  push 'n'
+  wchar
+  push 't'
+  wchar
+  push 'l'
+  wchar
+  push 'y'
+  wchar
+  push ' '
+  wchar
+  push 'p'
+  wchar
+  push 'l'
+  wchar
+  push 'a'
+  wchar
+  push 'y'
+  wchar
+  push 'e'
+  wchar
+  push 'r'
+  wchar
+  push ' '
+  wchar
+
+  push 500 ; PLAYER
+  load
+  wchar
+
+  ; print "'s turn\n"
+  push "'"
+  wchar
+  push 's'
+  wchar
+  push ' '
+  wchar
+  push 't'
+  wchar
+  push 'u'
+  wchar
+  push 'r'
+  wchar
+  push 'n'
+  wchar
+  push '\n'
+  wchar
+
+  ret
+
+; +---------------------+
+; | Proc: print_board() |
+; +---------------------+
+print_board:
+  push 1000
+  load
+  wchar
+  push '|'
+  wchar
+  push 1001
+  load
+  wchar
+  push '|'
+  wchar
+  push 1002
+  load
+  wchar
+  push '\n'
+  wchar
+  push '-'
+  wchar
+  push '+'
+  wchar
+  push '-'
+  wchar
+  push '+'
+  wchar
+  push '-'
+  wchar
+  push '\n'
+  wchar
+  push 1003
+  load
+  wchar
+  push '|'
+  wchar
+  push 1004
+  load
+  wchar
+  push '|'
+  wchar
+  push 1005
+  load
+  wchar
+  push '\n'
+  wchar
+  push '-'
+  wchar
+  push '+'
+  wchar
+  push '-'
+  wchar
+  push '+'
+  wchar
+  push '-'
+  wchar
+  push '\n'
+  wchar
+  push 1006
+  load
+  wchar
+  push '|'
+  wchar
+  push 1007
+  load
+  wchar
+  push '|'
+  wchar
+  push 1008
+  load
+  wchar
+  push '\n'
+  wchar
+  ret
