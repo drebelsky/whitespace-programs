@@ -1,0 +1,61 @@
+; print_primes.wsa
+; Print all the primes up to 100000 using the naive O(n^2) algorithm
+
+push 0
+loop:
+  ; break after 100000
+  dup
+  push 100000
+  sub
+  jz end
+
+  call is_prime
+  
+  jz inc
+  dup
+  wnum
+  push '\n'
+  wchar
+inc:
+  push 1
+  add
+  jump loop
+end:
+  end
+
+; proc: is_prime: return if n is prime
+; pre: input (n) is on stack
+; post: input (n) is on stack, return value is 1 or 0
+is_prime:
+  ; return false if less than 2
+  dup
+  push 2
+  sub
+  jn is_prime.false
+
+  push 2
+  is_prime.loop:
+    ; return true if we're at the number
+    copy 1
+    copy 1
+    sub
+    jz is_prime.true
+    
+    copy 1
+    copy 1
+    mod
+    jz is_prime.false_pop
+    push 1
+    add
+    jump is_prime.loop
+
+  is_prime.false_pop:
+    pop
+  is_prime.false:
+    push 0
+    ret
+
+  is_prime.true:
+    pop
+    push 1
+    ret
