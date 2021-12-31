@@ -87,7 +87,7 @@ def main():
 
     for lineno, inst in instructions:
         if inst[0] not in operations:
-            print_error(lineno, "Don't know how to assemble `{inst[0]}'")
+            print_error(lineno, f"Don't know how to assemble `{inst[0]}'")
             continue
 
         signature = operations[inst[0]]
