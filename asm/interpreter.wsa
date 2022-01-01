@@ -5,6 +5,10 @@ read_instructions:
     push 0
     read_instructions.loop:
     call read_inst
+    dup
+    push -1
+    sub
+    jz finished_reading
     copy 1
     push 2
     mul
@@ -58,7 +62,7 @@ getc:
     dup
     push 'T'
     sub
-    jz finished_reading
+    jz getc.finished_reading
     getc.try_ret:
     dup
     push ' '
@@ -74,6 +78,9 @@ getc:
     jz getc.ret
     pop
     jump getc
+    getc.finished_reading:
+    pop
+    push -1
     getc.ret:
     ret
 read_inst:
@@ -90,6 +97,10 @@ read_inst:
     push '\t'
     sub
     jz read_inst.T
+    dup
+    push -1
+    sub
+    jz read_inst.-1
     jump error
     read_inst.L:
     pop
@@ -106,6 +117,10 @@ read_inst:
     push '\t'
     sub
     jz read_inst.LT
+    dup
+    push -1
+    sub
+    jz read_inst.-1
     jump error
     read_inst.LL:
     pop
@@ -114,6 +129,10 @@ read_inst:
     push '\n'
     sub
     jz read_inst.LLL
+    dup
+    push -1
+    sub
+    jz read_inst.-1
     jump error
     read_inst.LLL:
     pop
@@ -134,6 +153,10 @@ read_inst:
     push '\t'
     sub
     jz read_inst.LST
+    dup
+    push -1
+    sub
+    jz read_inst.-1
     jump error
     read_inst.LSL:
     pop
@@ -165,6 +188,10 @@ read_inst:
     push '\t'
     sub
     jz read_inst.LTT
+    dup
+    push -1
+    sub
+    jz read_inst.-1
     jump error
     read_inst.LTL:
     pop
@@ -195,6 +222,10 @@ read_inst:
     push '\t'
     sub
     jz read_inst.ST
+    dup
+    push -1
+    sub
+    jz read_inst.-1
     jump error
     read_inst.SL:
     pop
@@ -211,6 +242,10 @@ read_inst:
     push '\t'
     sub
     jz read_inst.SLT
+    dup
+    push -1
+    sub
+    jz read_inst.-1
     jump error
     read_inst.SLL:
     pop
@@ -240,6 +275,10 @@ read_inst:
     push ' '
     sub
     jz read_inst.STS
+    dup
+    push -1
+    sub
+    jz read_inst.-1
     jump error
     read_inst.STL:
     pop
@@ -266,6 +305,10 @@ read_inst:
     push '\t'
     sub
     jz read_inst.TT
+    dup
+    push -1
+    sub
+    jz read_inst.-1
     jump error
     read_inst.TL:
     pop
@@ -278,6 +321,10 @@ read_inst:
     push '\t'
     sub
     jz read_inst.TLT
+    dup
+    push -1
+    sub
+    jz read_inst.-1
     jump error
     read_inst.TLS:
     pop
@@ -290,6 +337,10 @@ read_inst:
     push '\t'
     sub
     jz read_inst.TLST
+    dup
+    push -1
+    sub
+    jz read_inst.-1
     jump error
     read_inst.TLSS:
     pop
@@ -310,6 +361,10 @@ read_inst:
     push '\t'
     sub
     jz read_inst.TLTT
+    dup
+    push -1
+    sub
+    jz read_inst.-1
     jump error
     read_inst.TLTS:
     pop
@@ -330,6 +385,10 @@ read_inst:
     push '\t'
     sub
     jz read_inst.TST
+    dup
+    push -1
+    sub
+    jz read_inst.-1
     jump error
     read_inst.TSS:
     pop
@@ -346,6 +405,10 @@ read_inst:
     push '\t'
     sub
     jz read_inst.TSST
+    dup
+    push -1
+    sub
+    jz read_inst.-1
     jump error
     read_inst.TSSL:
     pop
@@ -370,6 +433,10 @@ read_inst:
     push '\t'
     sub
     jz read_inst.TSTT
+    dup
+    push -1
+    sub
+    jz read_inst.-1
     jump error
     read_inst.TSTS:
     pop
@@ -390,6 +457,10 @@ read_inst:
     push '\t'
     sub
     jz read_inst.TTT
+    dup
+    push -1
+    sub
+    jz read_inst.-1
     jump error
     read_inst.TTS:
     pop
@@ -398,6 +469,8 @@ read_inst:
     read_inst.TTT:
     pop
     push 23
+    ret
+    read_inst.-1:
     ret
 error:
     push 'A'
