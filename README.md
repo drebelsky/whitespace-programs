@@ -48,4 +48,4 @@ Numbers can be written either in decimal (e.g., `10`, `123`, etc...) or as a cha
 `;` can be used for commenting--all characters starting at the `;` and going to the end of the line will be ignored
 
 ### Other Miscellaneous Notes
-Except for separating at least one space separating arguments and instructions being separated by newlines, (ironically) white space is ignored.
+Except for at least one space separating arguments and instructions being separated by newlines, (ironically) white space is ignored.
